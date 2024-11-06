@@ -20,7 +20,8 @@ export class AppComponent {
   title = 'resource-api-demo';
 
   postId = signal(1);
- 
+  userId = signal(1);
+
   /* todoResource = resource({
      loader: () => {
        return Promise.resolve({ id: 1, title: "Hello World", completed: false });
@@ -28,31 +29,53 @@ export class AppComponent {
    });
  */
 
- /* myResource = resource({
+  /* myResource = resource({
+     loader: () => {
+       return fetch(`https://jsonplaceholder.typicode.com/posts`)
+         .then((res) => res.json() as Promise<any[]>);
+     },
+   });
+ */
+
+  /*myResource = resource({
     loader: () => {
-      return fetch(`https://jsonplaceholder.typicode.com/posts`)
+      return fetch(`https://jsonplaceholder.typicode.com/posts?id=${this.postId()}`)
+        .then((res) => res.json() as Promise<any[]>);
+    },
+  });
+  */
+
+
+/*
+  myResource = resource({
+    request: this.postId,
+    loader: ({ request: postId }) => {
+      return fetch(`https://jsonplaceholder.typicode.com/posts?id=${this.postId()}`)
         .then((res) => res.json() as Promise<any[]>);
     },
   });
 */
 
-/*myResource = resource({
-  loader: () => {
-    return fetch(`https://jsonplaceholder.typicode.com/posts?id=${this.postId()}`)
+/*
+myResource = resource({
+  request: this.postId,
+  loader: ({ request: postId }) => {
+    return fetch(`https://jsonplaceholder.typicode.com/posts?id=${this.postId()}`,
+      {signal: abortSignal})
       .then((res) => res.json() as Promise<any[]>);
   },
 });
 */
 
 myResource = resource({
-  request: this.postId, 
+  request: this.postId,
   loader: ({ request: postId }) => {
-    return fetch(`https://jsonplaceholder.typicode.com/posts?id=${this.postId()}`)
+    return fetch(`https://jsonplaceholder.typicode.com/posts?id=${this.postId()}&userId=${this.userId()}`)
       .then((res) => res.json() as Promise<any[]>);
   },
 });
 
-  updateResource() {
+updateResource() {
     this.myResource.value.update((value) => {
       if (!value) return undefined;
 
@@ -61,8 +84,17 @@ myResource = resource({
   }
 
   refreshResource() {
-   this.myResource.reload();
+    this.myResource.reload();
   }
 
+  changePostId() {
+    this.postId.set(Math.ceil(Math.random() * 10));
+  }
+
+  changePostIdAndUserId() {
+    this.postId.set(Math.ceil(Math.random() * 10));
+    this.userId.set(Math.ceil(Math.random() * 10));
+
+  }
 
 }
