@@ -67,13 +67,22 @@ myResource = resource({
 });
 */
 
-myResource = resource({
+/*myResource = resource({
   request: this.postId,
   loader: ({ request: postId }) => {
     return fetch(`https://jsonplaceholder.typicode.com/posts?id=${this.postId()}&userId=${this.userId()}`)
       .then((res) => res.json() as Promise<any[]>);
   },
-});
+});*/
+
+    myResource = resource({
+    request: () => ({ postId: this.postId(), userId: this.userId() }),
+    loader: ({ request, abortSignal }) => {
+      const { postId, userId } = request as { postId: number; userId: number };
+      return fetch(`https://jsonplaceholder.typicode.com/posts?id=${this.postId()}&userId=${this.userId()}`)
+        .then((res) => res.json() as Promise<any[]>);
+    },
+  });
 
 updateResource() {
     this.myResource.value.update((value) => {
